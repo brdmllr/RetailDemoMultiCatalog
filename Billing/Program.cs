@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Messages;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Transport.SQLServer;
 
 namespace Billing
 {
@@ -17,6 +18,8 @@ namespace Billing
 
             var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
             transport.ConnectionString(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailDemo;Integrated Security=True");
+
+            transport.DefaultSchema("transport");
 
             var routing = transport.Routing();
             routing.RegisterPublisher(eventType: typeof(OrderPlaced), publisherEndpoint: "Sales");

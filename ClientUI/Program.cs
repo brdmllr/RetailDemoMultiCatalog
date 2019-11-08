@@ -5,6 +5,7 @@ using Messages;
 using NServiceBus;
 using NServiceBus.Logging;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Transport.SQLServer;
 
 namespace ClientUI
 {
@@ -18,6 +19,8 @@ namespace ClientUI
 
             var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
             transport.ConnectionString(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailDemo;Integrated Security=True");
+
+            transport.DefaultSchema("transport");
 
             var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
             persistence.SqlDialect<SqlDialect.MsSqlServer>();
