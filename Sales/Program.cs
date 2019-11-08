@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.Persistence.Sql;
 
 namespace Sales
 {
@@ -12,7 +14,17 @@ namespace Sales
 
             var endpointConfiguration = new EndpointConfiguration("Sales");
 
-            var transport = endpointConfiguration.UseTransport<LearningTransport>();
+            var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
+            transport.ConnectionString(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailDemo;Integrated Security=True");
+
+            var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+            persistence.SqlDialect<SqlDialect.MsSqlServer>();
+            persistence.ConnectionBuilder(() => new SqlConnection(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailDemo;Integrated Security=True"));
+            persistence.SubscriptionSettings().DisableCache();
+
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
+
+            endpointConfiguration.EnableInstallers();
 
             var endpointInstance = await Endpoint.Start(endpointConfiguration)
                 .ConfigureAwait(false);

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Messages;
 using NServiceBus;
 using NServiceBus.Logging;
+using NServiceBus.Persistence.Sql;
 
 namespace ClientUI
 {
@@ -14,7 +16,17 @@ namespace ClientUI
 
             var endpointConfiguration = new EndpointConfiguration("ClientUI");
 
-            var transport = endpointConfiguration.UseTransport<LearningTransport>();
+            var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
+            transport.ConnectionString(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailDemo;Integrated Security=True");
+
+            var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+            persistence.SqlDialect<SqlDialect.MsSqlServer>();
+            persistence.ConnectionBuilder(() => new SqlConnection(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailDemo;Integrated Security=True"));
+            persistence.SubscriptionSettings().DisableCache();
+
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
+
+            endpointConfiguration.EnableInstallers();
 
             var routing = transport.Routing();
             routing.RouteToEndpoint(typeof(PlaceOrder), "Sales");

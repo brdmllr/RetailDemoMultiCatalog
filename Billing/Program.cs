@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Messages;
 using NServiceBus;
+using NServiceBus.Persistence.Sql;
 
 namespace Billing
 {
@@ -12,7 +15,20 @@ namespace Billing
 
             var endpointConfiguration = new EndpointConfiguration("Billing");
 
-            var transport = endpointConfiguration.UseTransport<LearningTransport>();
+            var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
+            transport.ConnectionString(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailDemo;Integrated Security=True");
+
+            var routing = transport.Routing();
+            routing.RegisterPublisher(eventType: typeof(OrderPlaced), publisherEndpoint: "Sales");
+
+            var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
+            persistence.SqlDialect<SqlDialect.MsSqlServer>();
+            persistence.ConnectionBuilder(() => new SqlConnection(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailDemo;Integrated Security=True"));
+            persistence.SubscriptionSettings().DisableCache();
+
+            endpointConfiguration.UseSerialization<NewtonsoftSerializer>();
+
+            endpointConfiguration.EnableInstallers();
 
             var endpointInstance = await Endpoint.Start(endpointConfiguration)
                 .ConfigureAwait(false);
