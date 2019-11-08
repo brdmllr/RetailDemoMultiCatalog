@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Persistence.Sql;
+using NServiceBus.Transport.SQLServer;
 
 namespace Sales
 {
@@ -16,6 +17,8 @@ namespace Sales
 
             var transport = endpointConfiguration.UseTransport<SqlServerTransport>();
             transport.ConnectionString(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailDemo;Integrated Security=True");
+
+            transport.DefaultSchema("transport");
 
             var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
             persistence.SqlDialect<SqlDialect.MsSqlServer>();
