@@ -22,6 +22,10 @@ namespace ClientUI
 
             transport.DefaultSchema("transport");
 
+            transport.UseCatalogForEndpoint("Billing", "RetailDemo-NSB");
+            transport.UseCatalogForEndpoint("Sales", "RetailDemo-NSB");
+            transport.UseCatalogForEndpoint("Shipping", "RetailDemo-NSB");
+
             var persistence = endpointConfiguration.UsePersistence<SqlPersistence>();
             persistence.SqlDialect<SqlDialect.MsSqlServer>();
             persistence.ConnectionBuilder(() => new SqlConnection(@"Data Source=(localdb)\mssqllocaldb;Initial Catalog=RetailDemo;Integrated Security=True"));

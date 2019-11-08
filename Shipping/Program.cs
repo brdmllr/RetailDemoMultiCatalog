@@ -21,6 +21,10 @@ namespace Shipping
 
             transport.DefaultSchema("transport");
 
+            transport.UseCatalogForEndpoint("Billing", "RetailDemo-NSB");
+            transport.UseCatalogForEndpoint("Sales", "RetailDemo-NSB");
+            transport.UseCatalogForEndpoint("Shipping", "RetailDemo-NSB");
+
             var routing = transport.Routing();
             routing.RegisterPublisher(eventType: typeof(OrderPlaced), publisherEndpoint: "Sales");
             routing.RegisterPublisher(eventType: typeof(OrderBilled), publisherEndpoint: "Billing");
